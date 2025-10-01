@@ -1,48 +1,43 @@
-package day001.challeng.service;
+package day001.service;
 
-import day001.challeng.FiltroProduto;
-import day001.challeng.model.Produto;
+
+import day001.model.Produto;
 
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+/**
+ * SOLID: Single Responsibility Principle (SRP)
+ * Responsabilidade: Operações de negócio sobre produtos
+ */
 public class ProdutoService {
-    
-    /**
-     * SOLID: Dependency Inversion Principle (DIP)
-     * 
-     * Depende de ABSTRAÇÃO (FiltroProduto/Predicate)
-     * Não depende de implementação concreta
-     */
-    public List<Produto> filtrar(List<Produto> produtos, FiltroProduto filtro) {
+
+    public List<Produto> filtrar(List<Produto> produtos, Predicate<Produto> filtro) {
         return produtos.stream()
-                       .filter(filtro)
-                       .collect(Collectors.toList());
+                .filter(filtro)
+                .collect(Collectors.toList());
     }
-    
+
     public List<String> obterNomes(List<Produto> produtos) {
         return produtos.stream()
-                       .map(Produto::getNome)
-                       .collect(Collectors.toList());
+                .map(Produto::getNome)
+                .collect(Collectors.toList());
     }
-    
+
     public double calcularTotal(List<Produto> produtos) {
         return produtos.stream()
-                       .mapToDouble(Produto::getPreco)
-                       .sum();
+                .mapToDouble(Produto::getPreco)
+                .sum();
     }
-    
+
     public long contar(List<Produto> produtos) {
         return produtos.stream().count();
     }
-    
-    /**
-     * SOLID: Open/Closed Principle (OCP)
-     * 
-     * Método extensível: pode aplicar QUALQUER filtro
-     * sem modificar este código!
-     */
+
     public List<Produto> filtrarPorPrecoMinimo(List<Produto> produtos, double precoMinimo) {
-        return filtrar(produtos, FiltroProduto.porPrecoMinimo(precoMinimo));
+        return produtos.stream()
+                .filter(p -> p.getPreco() > precoMinimo)
+                .collect(Collectors.toList());
     }
 }
