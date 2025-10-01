@@ -1,14 +1,20 @@
-package day001.challeng;
+package day001.filters;
 
 
-import day001.challeng.model.Produto;
+import day001.model.Produto;
 
 import java.util.function.Predicate;
 
+/**
+ * SOLID: Open/Closed Principle (OCP)
+ * Interface extensível para criar novos filtros sem modificar código existente
+ */
 @FunctionalInterface
 public interface FiltroProduto extends Predicate<Produto> {
 
-    // Filtros pré-definidos (Factory Method Pattern)
+    /**
+     * Factory methods para criar filtros comuns
+     */
     static FiltroProduto porPrecoMinimo(double precoMinimo) {
         return produto -> produto.getPreco() > precoMinimo;
     }
@@ -18,11 +24,8 @@ public interface FiltroProduto extends Predicate<Produto> {
     }
 
     static FiltroProduto porNomeContem(String texto) {
-        return produto -> produto.getNome().toLowerCase()
+        return produto -> produto.getNome()
+                .toLowerCase()
                 .contains(texto.toLowerCase());
-    }
-
-    static FiltroProduto porPrecoExato(double preco) {
-        return produto -> produto.getPreco() == preco;
     }
 }
