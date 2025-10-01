@@ -1,7 +1,11 @@
-package day001.challeng.model;
+package day001.model;
 
 import java.util.Objects;
 
+/**
+ * SOLID: Single Responsibility Principle (SRP)
+ * Responsabilidade: Representar um Produto com seus dados
+ */
 public class Produto {
     private final String nome;
     private final double preco;
@@ -13,7 +17,6 @@ public class Produto {
         if (preco < 0) {
             throw new IllegalArgumentException("Preço não pode ser negativo");
         }
-
         this.nome = nome;
         this.preco = preco;
     }
