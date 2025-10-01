@@ -1,29 +1,40 @@
-package day001.exercise;
+package day001.challenge;
 
-import day001.challeng.FiltroProduto;
-import day001.challeng.model.Produto;
-import day001.challeng.service.ProdutoService;
-import day001.challeng.service.RelatorioService;
+import day001.filters.FiltroProduto;
+import day001.model.Produto;
+import day001.service.ProdutoService;
+import day001.service.RelatorioService;
 
+
+import java.util.Arrays;
 import java.util.List;
+import java.util.function.Predicate;
 
+/**
+ * SOLID: Dependency Inversion Principle (DIP)
+ * Orquestra o desafio usando injeção de dependências
+ */
 public class DesafioDoDia001 {
 
     private final ProdutoService produtoService;
     private final RelatorioService relatorioService;
 
-    /**
-     * SOLID: Dependency Inversion Principle (DIP)
-     *
-     * Injeção de dependências via construtor
-     * Facilita testes (pode injetar mocks)
-     */
+    // Construtor sem parâmetros (cria as dependências)
+    public DesafioDoDia001() {
+        this.produtoService = new ProdutoService();
+        this.relatorioService = new RelatorioService();
+    }
+
+    // Construtor com injeção de dependências (para testes)
     public DesafioDoDia001(ProdutoService produtoService, RelatorioService relatorioService) {
         this.produtoService = produtoService;
         this.relatorioService = relatorioService;
     }
 
-    public void executar(List<Produto> produtos) {
+    public void executar() {
+        // Criar lista de produtos
+        List<Produto> produtos = criarProdutos();
+
         // Exibir todos produtos
         relatorioService.exibirTodosProdutos(produtos);
 
@@ -51,36 +62,41 @@ public class DesafioDoDia001 {
         demonstrarExtensibilidade(produtos);
     }
 
-    /**
-     * SOLID: Open/Closed Principle (OCP)
-     *
-     * Demonstra como adicionar NOVOS filtros
-     * sem modificar código existente!
-     */
+    private List<Produto> criarProdutos() {
+        return Arrays.asList(
+                new Produto("Notebook", 3500.00),
+                new Produto("Mouse", 50.00),
+                new Produto("Teclado", 150.00),
+                new Produto("Monitor", 800.00),
+                new Produto("Webcam", 80.00),
+                new Produto("Headset", 120.00),
+                new Produto("SSD 500GB", 400.00)
+        );
+    }
+
     private void demonstrarExtensibilidade(List<Produto> produtos) {
         System.out.println("\n=== DEMONSTRAÇÃO: EXTENSIBILIDADE (OCP) ===");
 
         // Filtro 1: Preço entre 50 e 200
-        var filtroPrecario = FiltroProduto.porPrecoMinimo(50)
+        Predicate<Produto> filtroPrecario = FiltroProduto.porPrecoMinimo(50)
                 .and(FiltroProduto.porPrecoMaximo(200));
 
-        List<Produto> produtosMedianos = produtoService.filtrar(produtos, p -> filtroPrecario.test(p));
+        List<Produto> produtosMedianos = produtoService.filtrar(produtos, filtroPrecario);
         relatorioService.exibirNomesProdutos(
                 produtoService.obterNomes(produtosMedianos),
                 "💡 Produtos entre R$ 50 e R$ 200:"
         );
 
         // Filtro 2: Nome contém "Teclado" OU "Mouse"
-        var filtroPerifericos = FiltroProduto.porNomeContem("Teclado")
+        Predicate<Produto> filtroPerifericos = FiltroProduto.porNomeContem("Teclado")
                 .or(FiltroProduto.porNomeContem("Mouse"));
 
-        List<Produto> perifericos = produtoService.filtrar(produtos, p -> filtroPerifericos.test(p));
+        List<Produto> perifericos = produtoService.filtrar(produtos, filtroPerifericos);
         relatorioService.exibirNomesProdutos(
                 produtoService.obterNomes(perifericos),
                 "🖱️ Periféricos (Teclado ou Mouse):"
         );
 
-        System.out.println("\n✅ Adicionamos 2 filtros NOVOS sem modificar código existente!");
+        System.out.println("\n✅ Adicionamos 2 filtros NOVOS sem modificar código existente! (OCP)");
     }
 }
-
